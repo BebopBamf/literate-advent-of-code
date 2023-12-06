@@ -1,0 +1,39 @@
+# Ignore Dune build artifacts
+/_build/
+
+# Ignore installed OPAM packages
+/opam-switch/
+
+# Ignore Emacs and Org mode temporary files
+*.elc
+*.org~
+*.org#
+*.bbl
+*.pdf
+*.tex
+
+# Ignore compiled OCaml files
+*.cmi
+*.cmo
+*.cmt
+*.cmti
+*.cmx
+*.o
+*.byte
+
+# Ignore generated documentation
+/_doc/
+
+# Ignore editor backup files
+*~
+
+# Ignore local configuration files
+.dune
+
+# macOS specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+ehthumbs.db
+Thumbs.db
