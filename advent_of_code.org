@@ -17,7 +17,7 @@ first. Each puzzle grants /one star/. Good luck!
 You try to ask why they can't just use a *weather machine* ("not powerful enough")
 and where they're even sending you ("the sky") and why your map looks mostly
 blank ("you sure ask a lot of questions") and hang on did you just say the sky
-("of course, where do you think snow comes from") when you realize that the
+("of course, where do you think snow comes from") when you realise that the
 Elves are already loading you into a *trebuchet* ("please hold still, we need to
 strap you in").
 
@@ -80,4 +80,109 @@ read_content "day_one.txt"
 #+begin_src ocaml
 (* RESULTS *)
 - : int = 54990
+#+end_src
+
+* Day 2: Cube Conundrum
+
+You're launched high into the atmosphere! The apex of your trajectory just
+barely reaches the surface of a large island floating in the sky. You gently
+land in a fluffy pile of leaves. It's quite cold, but you don't see much snow.
+An Elf runs over to greet you.
+
+The Elf explains that you've arrived at /Snow Island/ and apologises for the lack
+of snow. He'll be happy to explain the situation, but it's a bit of a walk, so
+you have some time. They don't get many visitors up here; would you like to play
+a game in the meantime?
+
+As you walk, the Elf shows you a small bag and some cubes which are either red,
+green, or blue. Each time you play this game, he will hide a secret number of
+cubes of each colour in the bag, and your goal is to figure out information
+about the number of cubes.
+
+To get information, once a bag has been loaded with cubes, the Elf will reach
+into the bag, grab a handful of random cubes, show them to you, and then put
+them back in the bag. He'll do this a few times per game.
+
+You play several games and record the information from each game (your puzzle
+input). Each game is listed with its ID number (like the =11= in =Game 11: ...=)
+followed by a semicolon-separated list of subsets of cubes that were revealed
+from the bag (like =3 red, 5 green, 4 blue=).
+
+For example, the record of a few games might look like this:
+
+#+BEGIN_EXPORT ascii
+Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
+Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
+Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
+#+END_EXPORT
+
+In game 1, three sets of cubes are revealed from the bag (and then put back
+again). The first set is 3 blue cubes and 4 red cubes; the second set is 1 red
+cube, 2 green cubes, and 6 blue cubes; the third set is only 2 green cubes.
+
+The Elf would first like to know which games would have been possible if the bag
+contained /only 12 red cubes, 13 green cubes, and 14 blue cubes/?
+
+In the example above, games 1, 2, and 5 would have been /possible/ if the bag had
+been loaded with that configuration. However, game 3 would have been /impossible/
+because at one point the Elf showed you 20 red cubes at once; similarly, game 4
+would also have been /impossible/ because the Elf showed you 15 blue cubes at
+once. If you add up the IDs of the games that would have been possible, you
+get 8.
+
+Determine which games would have been possible if the bag had been loaded with
+only 12 red cubes, 13 green cubes, and 14 blue cubes. /What is the sum of the
+IDs of those games?/
+
+#+BEGIN_SRC ocaml :results value code
+#load "str.cma";;
+
+type colour =
+  | Red of int
+  | Green of int
+  | Blue of int;;
+
+let into_colour str =
+  let values = String.trim str |> String.split_on_char ' ' in
+  match values with
+  | weight_str :: colour :: _ ->
+    let weight = int_of_string weight_str in
+    (match colour with
+    | "red" -> Red weight
+    | "green" -> Green weight
+    | "blue" -> Blue weight
+    | _ -> failwith "Unknown colour")
+  | _ -> failwith "Invalid input";;
+
+let colour_from_list str =
+  let colours = String.split_on_char ',' str in
+  List.map into_colour colours;;
+
+let clean_input str =
+  Str.global_replace (Str.regexp ";") "," str;;
+
+let validate_colour col =
+  match col with
+    | Red weight -> weight <= 12
+    | Green weight -> weight <= 13
+    | Blue weight -> weight <= 14;;
+
+let strip_game s = Str.global_replace (Str.regexp "^Game [0-9]+: ") "" s;;
+
+read_content "day_two_test.txt"
+|> String.split_on_char '\n'
+|> List.filter (fun line -> line <> "")
+|> List.map (fun line -> strip_game line |> clean_input |> colour_from_list)
+#+END_SRC
+
+#+RESULTS:
+#+begin_src ocaml
+- : colour list list =
+[[Blue 3; Red 4; Red 1; Green 2; Blue 6; Green 2];
+ [Blue 1; Green 2; Green 3; Blue 4; Red 1; Green 1; Blue 1];
+ [Green 8; Blue 6; Red 20; Blue 5; Red 4; Green 13; Green 5; Red 1];
+ [Green 1; Red 3; Blue 6; Green 3; Red 6; Green 3; Blue 15; Red 14];
+ [Red 6; Blue 1; Green 3; Blue 2; Red 1; Green 2]]
 #+end_src
